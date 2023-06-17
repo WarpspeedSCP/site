@@ -1,0 +1,41 @@
+version: "2"
+
+services:
+  remark:
+    # remove the next line in case you want to use this docker-compose separately
+    # as otherwise it would complain for absence of Dockerfile
+    build: .
+    image: umputun/remark42:latest
+    container_name: "remark42"
+    restart: always
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+    # uncomment to expose directly (no proxy)
+    #ports:
+    #  - "80:8080"
+    #  - "443:8443"
+
+    environment:
+      - REMARK_URL="https://wscp.dev/comments"
+      - SECRET="eyJhbGciOiJIUzI1NiJ9.eyJSb2xlIjoiQWRtaW4iLCJJc3N1ZXIiOiJJc3N1ZXIiLCJVc2VybmFtZSI6IkphdmFJblVzZSIsImV4cCI6MTY3MjI5NTM0MCwiaWF0IjoxNjcyMjk1MzQwfQ.xXe51eH2xI3jUaRVyDGqR7mk1LRrRloZq7b0ySET3g4"
+      - DEBUG=true
+      - AUTH_ANONYMOUS
+      # - AUTH_GOOGLE_CID
+      # - AUTH_GOOGLE_CSEC
+      - AUTH_GITHUB_CID="183b7116d6a6ec11c8cf"
+      - AUTH_GITHUB_CSEC="30187e202d477f226719f902a93e4b817038d234"
+      # - AUTH_FACEBOOK_CID
+      # - AUTH_FACEBOOK_CSEC
+      # - AUTH_DISQUS_CID
+      # - AUTH_DISQUS_CSEC
+      # Enable it only for the initial comment import or for manual backups.
+      # Do not leave the server running with the ADMIN_PASSWD set if you don't have an intention
+      # to keep creating backups manually!
+      - ADMIN_PASSWD="HeeeHooo01247"
+    volumes:
+      - ./data:/srv/var

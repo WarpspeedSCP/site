@@ -3,7 +3,7 @@ baseUrl: "https://wscp.dev"
 title: "WSCP's blog"
 theme: "anubis"
 paginate: 10
-# disqusShortname: "yourdiscussshortname"
+disqusShortname: "wscp-dev"
 # googleAnalytics: "G-12345"
 # enableRobotsTXT: true
 
@@ -13,7 +13,16 @@ menu:
     name: Archive
     title: Archive
     url: /posts/
-    weight: 0
+    weight: 1
+  - identifier: about
+    name: About
+    title: About
+    url: /about
+    weight: 2
+  - identifier: donate
+    name: Donate
+    url: https://ko-fi.com/wscptl
+    weight: 3
 
 params:
   author: "wscp"
@@ -29,11 +38,10 @@ params:
   #   - js/main.js # relative path to "assets" directory
   dateFormat: "2006-01-02"
   paginationSinglePost: true
-  disqusShortname: "warpspeedscp"
   style: auto
-  readMore: false # show read more button
+  readMore: true # show read more button
   readNextPosts: 5  # show 5 related posts, 0 by default
-  disableSummary: false
+  disableSummary: true
   copyCodeButton: true # true by default
   rssAsSocialIcon: true
   # utteranc.es support
