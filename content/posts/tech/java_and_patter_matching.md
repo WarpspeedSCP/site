@@ -1,5 +1,5 @@
 ---
-title: "Java 21's pattern matching"
+title: "Java 21: The functional update"
 date: 2023-09-14T21:00:00+05:30
 categories:
 - JVM
@@ -21,13 +21,11 @@ slug: java-pattern-matching
 Whatever notation is used in this article is not representative of how the math is usually presented and if you study this further, or have already studied this subject, I may get terminology wrong and say things that don't mean what I think they do. Please do point out such mistakes in the comments, and I will update the article ASAP. Also note that I'm borrowing the type theory notation from Wikipedia.
 {{< /note-alert >}}
 
-Java 21 will release in a week or so, with support for record patterns in switch blocks and expressions. Such syntax is monumental (At least, in Java land) and marks the point where Java could be considered to properly support functional programming patterns in ways similar to Kotlin, Rust or C#.
+Java 21 will release on September 19, 2023, with support for record patterns in switch blocks and expressions. Such syntax is monumental (At least, in Java land) and marks the point where Java could be considered to properly support functional programming patterns in ways similar to Kotlin, Rust or C#.
 
 ## A brief history of recent Java versions.
 
-Java has evolved rapidly in the past 10 years (As of 2023). Java 8 was the last "slow" release, as all subsequent releases happened 6 months apart.
-
-Below is a table showing Java updates over the past decade, along with the major syntactic changes/additions made in each version (Most changes are omitted to stay on topic).
+Java has evolved rapidly in the past 10 years (As of 2023). Java 9 was the last "slow" release, as all subsequent releases happened 6 months apart. Below is a table showing Java updates over the past decade, along with the major syntactic changes/additions made in each version (Most changes are omitted to stay on topic). <br/>
 
 | Java Version | Release Date | Major Syntax Related Features                                                                                                                                                                                                                                                                                                        |
 | :----------- | :----------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -52,7 +50,7 @@ Java 14 stabilised switch expressions, 16 records and `instanceof` pattern match
 
 This set of changes allows Java to express one of the foundations of functional programming that the language never could before - Algebraic data types, along with idiomatic ways of using them. 
 
-Algebraic data types are a concept born from *Type theory*, which is a branch of Set theory that focuses specifically on questions like, "Is an *Apple* a *Fruit*?" and other such whimsical conundrums math teachers like to pose to hapless students the world over.
+Algebraic data types are a concept born from *Type theory*, which is a branch of Set theory that focuses specifically on questions like, <br/> "Is an *Apple* a *Fruit*?" and other such whimsical conundrums math teachers like to pose to hapless students the world over.
 
 ## A *very* minimal introduction to some terms from type theory
 
@@ -62,7 +60,7 @@ So instead of explaining type theory, I will talk about a few specific kinds of 
 
 ### The Bottom, or Empty Type (`⊥`)
 
-This type is used to describe the set of all values which *can't be computed*[^turing]. For any normal programming language, this set is usually empty (Ø). I don't believe any languages that can express values with no computable representation exist.
+This type is used to describe the set of all values which *can't be computed*[^turing]. For any normal programming language, this set is usually empty (Ø). I don't believe there exists a language that can express values with no computable representation.
 
 [^turing]: When I say can't be computed, I mean it in the [Turing-complete](https://en.wikipedia.org/wiki/Turing_completeness) sense.
 
@@ -84,7 +82,7 @@ Every object can be cast to top, since every value is present within `U`.
 
 There isn't much to say about Top, other than that a variable of this type can hold anything. Including a value of the bottom type. Good luck finding that value, though.
 
-### The Unit Type (`⊤`)
+### The Unit Type (`()`)
 
 This type has exactly one possible value; essentially an `enum` with a single variant. There is only one instance of that one value, and it is impossible to create more of it.
 
@@ -681,7 +679,7 @@ switch (color) {
     System.out.println("Very red.");
   }
   // You can use guards with direct pattern matching as well.
-  case RGB rgb when green > 100 -> {
+  case RGB rgb when rgb.green > 100 -> {
     System.out.println("Sort of green...");
     // ...  
   }
