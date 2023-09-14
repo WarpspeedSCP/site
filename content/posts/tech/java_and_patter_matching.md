@@ -13,6 +13,11 @@ keywords:
 - Java records
 - Java sealed types
 - Java Switch pattern matching
+- sealed types
+- pattern matching for switch
+- record patterns
+- sealed classes
+- switch pattern matching
 description: Algebraic data types in Java.
 slug: java-pattern-matching
 ---
