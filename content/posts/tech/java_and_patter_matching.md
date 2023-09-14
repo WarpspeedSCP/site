@@ -1,6 +1,6 @@
 ---
 title: "Java 21's pattern matching"
-date: 2023-09-14T00:00:00+05:30
+date: 2023-09-14T21:00:00+05:30
 categories:
 - JVM
 - pattern matching
