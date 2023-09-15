@@ -1,5 +1,5 @@
 ---
-title: "Java 21: The functional update"
+title: "Java 21 makes me actually like Java again"
 date: 2023-09-14T21:00:00+05:30
 categories:
 - JVM
@@ -23,10 +23,10 @@ slug: java-pattern-matching
 ---
 
 {{< note-alert >}}
-Whatever notation is used in this article does not represent how the math is usually presented. If you study this further or have already studied this subject, you may notice I've gotten the terminology wrong and said things that don't mean what I think they do. Please point out such mistakes in the comments, and I will update the article ASAP. Also, note that I'm borrowing the type theory notation from Wikipedia.
+Whatever notation is used in this article does not represent how the math is usually presented. If you study this further or have already studied this subject, there may be mistakes, or terms I've used incorrectly. Please point out such mistakes in the comments, and I will update the article ASAP. Also, note that I'm borrowing the type theory notation from Wikipedia.
 {{< /note-alert >}}
 
-Java 21 will be released on September 19, 2023, supporting record patterns in switch blocks and expressions. Such syntax is monumental (At least, in Java land). It marks the point where Java could be considered to properly support functional programming patterns in ways similar to Kotlin, Rust, or C#.
+Java 21 will be released on September 19, 2023, supporting record patterns in switch blocks and expressions. Such syntax is monumental (At least, in Java land). It marks the point where Java could be considered to properly support functional programming patterns in ways similar to Kotlin, Rust, or C#. And it marks the first point where I can say, as a Kotlin developer, that I feel jealous.
 
 ## A brief history of recent Java versions.
 
@@ -55,7 +55,7 @@ Java 14 stabilised switch expressions, 16 records and `instanceof` pattern match
 
 This set of changes allows Java to express one of the foundations of functional programming that the language never could before - Algebraic data types, along with idiomatic ways of using them. 
 
-Algebraic data types are a concept born from *Type theory*, which is a branch of Set theory that focuses specifically on questions like <br/> "Is an *Apple* a *Fruit*?" and other such whimsical conundrums math teachers like to pose to hapless students the world over.
+Algebraic data types are a concept born from *Type theory*, which is a branch of Set theory that focuses specifically on questions like "Is an *Apple* a *Fruit*?" and other such whimsical conundrums math teachers like to pose to hapless students the world over.
 
 ## A *very* minimal introduction to some terms from type theory
 
@@ -65,41 +65,43 @@ So, instead of explaining type theory, I will talk about a few specific kinds of
 
 ### The Bottom, or Empty Type (`⊥`)
 
-This type describes the set of all values which *can't be computed*[^turing]. This set is usually empty for any normal programming language (Ø). No Turing complete language can express values with no computable representation.
+This type describes the set of all values which *can't be computed*[^turing]. This set is usually empty for any normal programming language (Ø).
 
 [^turing]: When I say can't be computed, I mean it in the [Turing-complete](https://en.wikipedia.org/wiki/Turing_completeness) sense.
 
 No object can be cast to bottom since it is an empty set.
 
-An example of such a type is Kotlin's `Nothing`. `Nothing` is a type that cannot be constructed, which means it cannot be passed or returned either. It is considered an error for an instance of `Nothing` to exist. The way Kotlin prevents `Nothing` from being instantiated is [by setting its constructor to be private](https://github.com/JetBrains/kotlin/blob/7a7d392b3470b38d42f80c896b7270678d0f95c3/core/builtins/native/kotlin/Nothing.kt#L23).
+An example of such a type is Kotlin's `Nothing`. It is considered an error for an instance of `Nothing` to exist. The way Kotlin prevents `Nothing` from being instantiated is [by setting its constructor to be private](https://github.com/JetBrains/kotlin/blob/7a7d392b3470b38d42f80c896b7270678d0f95c3/core/builtins/native/kotlin/Nothing.kt#L23).
 
-The Java version of this type is [`Void`](https://docs.oracle.com/javase/8/docs/api/java/lang/Void.html), the wrapper class for the `void` primitive type. It is impossible to construct a `Void` instance because its constructor is private; thus, the only value a `Void` variable can hold is `null`. 
+The Java version of this type is [`Void`](https://docs.oracle.com/javase/8/docs/api/java/lang/Void.html), the wrapper class for the `void` primitive type. It is, again, impossible to construct a `Void` instance because its constructor is private. You will never find a `Void` variable that holds a value other than `null`. 
 
 Now, you may feel that this fact disqualifies `Void` from being the bottom type; after all, any `Void` variable can still contain the value `null`, meaning `Void` *can* be represented.
 
-For the purposes of this article, let's make it a rule for this discussion that `null` is not a valid value of *any* type in the JVM unless nullability is explicitly mentioned as a property of the type. Otherwise, `null` merely indicates the lack of a value.
+To solve this paradox, let's make it a rule for this discussion that `null` is not a valid value of *any* type in the JVM unless nullability is explicitly mentioned as a property of the type. We shall assume by default that `null` merely indicates the lack of a value.
 
 ### The Top Type (`⊤`)
 
-This type represents every value of every type - the universal set of values, `U`. So `java.lang.Object`, basically. In Kotlin, this type is named `Any`. Meanwhile, `C` does as it do and overloads `void` by using `void *` to represent a pointer that can refer to a value of any type instead. How droll!
+This type represents every value of every type - the universal set of values, `U`. Java's top type is `java.lang.Object`. In Kotlin, this type is named `Any`. Meanwhile, `C` does as it do and overloads `void` by using `void *` to represent a pointer that can refer to a value of any type instead. How droll!
 
-Every object can be cast to top since every value is present within `U`.
+Every object can be cast to top since `U` contains every value that exists.
 
 There isn't much to say about top other than that a variable of this type can hold anything. Including a value of the bottom type. Good luck finding that value, though.
 
 ### The Unit Type (`()`)
 
-This type has one possible value: it is an `enum` with a single variant. There is only one instance of that one value, and it is impossible to create more of it.
+This type has only one value. There is only one instance of that one value, and it is impossible to create more of it.
 
 Java's `void` primitive technically works like this. When a method returns `void`, you can treat it as if it implicitly returns the sole instance of the `void` type under the hood (This is *not* how the JVM handles `void`). Java deviates from the theoretical norm in that `void` can never be passed into a method as a parameter.
 
+{{< note-alert >}}
 The truth is, Java just mashes the bottom and the unit types together to give us `void`.
+{{< /note-alert >}}
 
-You can technically simulate the unit type in Java by declaring a new class that is final and has no fields other than a static instance value. Then, you'd be able to treat that instance as the sole instance of the unit type.
+You can technically simulate the unit type in Java by declaring a new class that is final and has no fields other than a static instance value. You would then be able to treat that instance as the sole unit type value.
 
-In fact, this is precisely how Kotlin defines its unit type, `Unit`. If you navigate to the definition of `Unit`, you'll see how simply it is defined; [it's just an `object`](https://github.com/JetBrains/kotlin/blob/7a7d392b3470b38d42f80c896b7270678d0f95c3/core/builtins/src/kotlin/Unit.kt#L22)! 
+In fact, this is precisely how Kotlin defines its own `Unit`. If you navigate to the definition of `Unit`, you'll see how simply it is defined; [it's just an `object`](https://github.com/JetBrains/kotlin/blob/7a7d392b3470b38d42f80c896b7270678d0f95c3/core/builtins/src/kotlin/Unit.kt#L22)! 
 
-Kotlin allows you to use `Unit` anywhere, including as a parameter to a method. The following snippet is thus legal:
+Unlike Java, Kotlin allows you to use `Unit` anywhere, including as a parameter to a method. The following snippet is thus legal:
 
 ```kotlin
 fun identity(param1: Unit): Unit = param1
@@ -113,13 +115,13 @@ We're now in familiar territory.
 
 The boolean type has two valid values, `true` and `false` (Or whatever other names you want to use). Indeed, you don't even need to use your language's native boolean type to represent this type; you can do just as well by using a nullable instance of a unit type. If the variable is non-null, it's `true`, and if it is `null`, `false`. This is of course, a useless waste of time fit only for those interested in obfuscating their source code.
 
-So far, we've looked at some basic examples of "rules" used to define types in type theory. Let's move onto the heart of the matter and discuss the key building blocks that Java's records and sealed classes give us access to: Sum and Product types.
+So far, we've looked at some basic examples of "rules" used to define types in type theory. Let's move onto the heart of the matter and discuss sum and product types, and how Java 21 allows us to represent them via records and sealed classes.
 
 ### The Product type
 
-Product types are types that are composed of two or more constituent types. These constituent types may or may not be related to the product type in some way or the other. A product type is a list of two or more types grouped together. A product type's *arity*, or *degree*, is the number of constituent types within it.
+Product types are composed of two or more constituent types. In general, a product type is a list of two or more types grouped together. A product type's *arity*, or *degree*, is the number of constituent types within it.
 
-And to drive the point home, here's one last fact: a product type is just your everyday bog-standard C `struct`.
+If you'd like a nice, concrete example of a product type, look no further than the humble C `struct`:
 
 ```c
 struct some_type {
@@ -130,13 +132,15 @@ struct some_type {
 };
 ```
 
-In the struct above, `some_type` is a product type composed of four different types: `int`, `char *`, `double`, and `int` again. Notice that we're repeating `int` here. How do we figure out which `int` is which when we perform operations on `some_type`? Simple, we associate each type with the name given to it in the struct! Thus, a product type is not merely a list of types but a list of *ordered pairs*, where each ordered pair consists of a type and a name associated with that type.
+In the struct above, `some_type` is a product type composed of four different types: `int`, `char *`, `double`, and `int` again. Notice that we're repeating `int` here. How do we figure out which `int` is which when we perform operations on `some_type`? This may seem obvious, but it's a problem in math, because you have to construct all the building blocks and concepts you use from scratch!
+
+In this case, we already have the tools to make this work. We associate each type with the name given to it in the struct (Duh). Mathematically speaking, a product type is not merely a list of types but a list of *ordered pairs*, where each ordered pair consists of a type and a name associated with that type.
 
 For example, we can represent the first value of `some_type` as the ordered pair `(int, "val1")`. That way, it's impossible to mix up the two `int` components; they've got different names!
 
 #### But what about tuples like in Python or Rust?
 
-Well, you can think of those as product types where the "name" is the index of the component type in the tuple.
+You can just think of those as product types where the "name" is the index of the component type in the tuple.
 
 ```python
 some_tuple = (1, '2', True, 5)
@@ -152,17 +156,10 @@ str_2 = some_tuple[1] # (str, 1)
 In set theory, the word product usually refers to the *Cartesian* product of two sets. 
 
 {{< note-alert >}}
-The Cartesian product of two sets is a set of ordered pairs of all elements of both sets.
+The Cartesian product of two sets is a set of ordered pairs made from every possible combination of every element from both sets.
 {{< /note-alert >}}
 
-In terms of type theory, the product of two types, `A` and `B`, is a new type, `C`, whose set of values is the Cartesian product of the sets of all values in `A` and `B`. That is, `C = A × B`. 
-
-{{< note-alert >}}
-This product operation is not commutative; `A × B` is *not* the same as `B × A`. If you think about it for a bit, you'll see why: you'd be switching around the order of the declared components!
-{{< /note-alert >}}
-
-
-The example I just talked about only uses two component types: A and B. How would we represent `some_type`, for example? The answer is to chain multiple product operations together, like so:
+You can use set theory notation to express the product of two types `A` and `B` as `C = A × B`. This product operation is not commutative; `A × B` is *not* the same as `B × A`. If you think about it for a bit, you'll see why: you'd be switching around the order of the declared components! The example I just talked about only uses two component types: `A` and `B`. How would we represent `some_type`, for example? The answer is to chain multiple product operations together, like so:
 
 ```
 some_type = int × char* × double × int
@@ -171,7 +168,7 @@ some_type = int × char* × double × int
 The set of values within a product type could be expressed like this (Please leave your complaints about my (ab)use of math symbols in the comments):
 
 ```
-T = A × B = {(a, b) | a ∈ A, b ∈ B}
+C = A × B = {(a, b) | a ∈ A, b ∈ B}
 ```
 
 You could represent the set of all values in `some_type` like this:
@@ -188,29 +185,33 @@ When Java 16 was released, the record class feature was stabilised. Record class
 
 This contrasts with normal Java classes, which are all over the place. You can have public and private state, there's hidden state via inheritance that you don't think about until it pops up like some haunted animatronic on caffeine to jumpscare you with weird bugs, and you can have mutable fields, static fields, and all sorts of other distracting things that yadda yadda yadda... (*you get the idea*). 
 
-The problem with normal Java types is that it is impossible to generalise what a type's components are. This becomes a problem when all you want is to efficiently process data; you have to navigate a maze of potentially nonstandard getters to even get at your data in the first place, let alone munge that data. 
+The problem with normal Java types is that it is impossible to generalise what a type's components are. And that matters when all you want is to efficiently process data; you have to navigate a maze of potentially nonstandard getters to even get at your data in the first place, let alone munge it.
 
-Now, Java never did support destructuring like Typescript or Rust do. But even if Java had supported it, the spec would still probably restrict that feature to records. Let's ask ourselves a few questions to better understand why. 
+Now, Java never did support destructuring like JavaScript or Rust do. But even if Java had supported it, the spec would still probably restrict that feature to records. Let's ask ourselves a few questions to better understand why. 
+
+{{< note-alert >}}
+Destructuring is a feature certain languages (very famously, JavaScript) have which allows you to take a complex value, and, to borrow a PHPism, ***EXPLODE*** it into its components as a list of completely independent variables. Read more about this feature [here](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment).
+{{< /note-alert >}}
 
 #### How would you even destructure a normal Java class anyway? 
 
 A Java class's internal state includes all its fields, both public and private. However, allowing the extraction of private fields by destructuring doesn't seem like a good idea; we all know how mad old Uncle Bob gets about breaking encapsulation. So fine, we have to exclude private state.
 
-#### Okay, what about public state, then?
+#### What about public state, then?
 
 Let's first think about this: How do Java objects expose public state? Sure, you can define a field as public, and if you want to prevent undue modification, make the field final. But there is another extremely common approach to this as well. Most Java objects set every field to be private and make all fields accessible only through accessor methods for reading and writing.
 
-Unfortunately, there are no *language enforced* conventions for defining accessors; you could give the getter for `foo' the name `getBar`, and it'll still work fine, except for the fact that it would confuse anybody trying to access `bar` and not `foo'. 
+Unfortunately, there are no *language enforced* conventions for defining accessors; you could give the getter for `foo` the name `getBar`, and it'll still work fine, except for the fact that it would confuse anybody trying to access `bar` and not `foo'. 
 
 Sure, you can use frameworks like Lombok to take away the complexity and uncertainty by slapping a few annotations on your POJO classes, but that doesn't change the underlying fact that normal classes in Java are *very difficult to statically reason about* due to how many "variables" contribute to defining the state of a class. 
 
-I suspect this prevented the Java Language Specification authors from immediately adding pattern matching to all classes.[^future]
+I suspect this is one of the problems that prevented the Java Language Specification authors from adding pattern matching to all classes right off the bat.[^future]
 
 [^future]: JEP-441 does mention this as [something to be taken up in the future](https://openjdk.org/jeps/441#Future-work). 
 
-To fix this, they created records, an entirely different class hierarchy. There was already a precedent; Java 5 introduced enums, which inherit from `java.lang.Enum`. Similarly, all records inherit from `java.lang.Record`. 
+To fix this, they created records, an entirely different class hierarchy. There is already a precedent; Java 5 introduced enums, which inherit from `java.lang.Enum`. Similarly, all records inherit from `java.lang.Record`. 
 
-#### Fine, but how do records do what normal classes don't?
+#### So how do records do what normal classes don't?
 
 Records solve this problem by restricting how they can be defined and rigidly defining the set of properties they can have. 
 
@@ -234,34 +235,77 @@ Specifically:
 
 These properties of records guarantee that any new language feature Java brings out that uses records such as pattern matching will always work, because the language spec itself guarantees the behaviour and structure of records.
 
-Here's how you'd pattern-match a record within a switch block:
+#### Sweet. Tell me what I can do with them.
+
+Pattern matching. 
+
+#### Continue...
+
+It's quite a drag to have to write extremely nested code when you have a lot of conditions based on the types of your data. This problem will come into perspective when I introduce sum types further into the article. Pattern matching is a way to statically (Meaning at compile time, as you write the code) verify that certain patterns are present in the data you are processing.
+
+Take a look at the example below. Note that the data within `A` is a `Record` instance, and could contain *any* record type. We first try printing `r`'s contents with normal Java if statements, before doing it with switch pattern matching.
 
 ```java
-record A(int a) {}
+record A(Record inner) {}
 record B(char b) {}
+record SomeOtherRecord() {}
 
 Record eitherAorB() {
-    return ((Math.random() * 100) % 2 == 0) ? A(1) : B('f'); // returns either A or B.
+  boolean cond1 = ((int)(Math.random() * 100) % 2 == 0);
+  boolean cond2 = ((int)(Math.random() * 100) % 2 == 0);
+    return cond1 ? new A(cond2 ? new A(null) : new B('e')) : new B('f'); // returns either A or B.
 }
 
-Record r = eitherAorB();
+void main() {
+  var r = eitherAorB();
 
-// The type is Record.
-var result = switch (r) {
-    case A(int a) -> String.valueOf(a); // Destructuring!
+  String oldJavaResult = "";
+
+  if (r instanceof A) {
+    var inner = ((A)r).inner(); // We have to cast it...
+    if (inner instanceof B) {
+      oldJavaResult = String.valueOf(((B)inner).b());
+    } else if (inner instanceof SomeOtherRecord) {
+      oldJavaResult = null;
+    }
+  } else if (r instanceof B) {
+    oldJavaResult = String.valueOf((B)r.b());
+  } else {
+    oldJavaResult = "r does not match any pattern";
+  }
+
+  System.out.println("With the old method: \"" + oldJavaResult + "\"");
+
+  // The type is Record.
+  var result = switch (r) {
+    case A(B(char a)) -> String.valueOf(a); // Destructuring!
+    case A(SomeOtherRecord(/* ... */)) -> {
+      // handle it.
+      yield null;
+    }
     case B(char b) -> String.valueOf(b);
     default -> "r does not match any pattern";
-};
-        
-System.out.println(result.toString());
+  };
+  
+  System.out.println(result.toString());
+}
 ```
 
-You should be able to copy this code into a main method and run it by compiling with the flags `--enable-preview --release 21` and running with the flag `--enable-preview`, assuming your Java version is 21 (There's a handy `jdk21-jetbrains-bin` package available in the AUR if anybody wants to immediately try it. I use Arch btw).
+The switch block is clearly better structured than the if-else ladder above. Switch patterns are very powerful when you want to quickly and easily extract deeply nested data without waffling around with `instanceof` checks and cumbersome type casts. If you ever get a chance to work with Java 21 (May you be blessed with management that isn't allergic to new Java versions), I'm sure you'll appreciate this feature.
 
+If you'd like to try this yourself, here's how. Install Java 21 (There's a handy [`jdk21-jetbrains-bin`](https://aur.archlinux.org/packages/jdk21-jetbrains-bin) package available in the AUR if anybody wants to immediately try it. I use Arch, btw). Copy this code into a `main.java` and run it with:
+
+```sh
+java --enable-preview --source 21 main.java
+```
+
+This also showcases another nice new preview feature, [unnamed main methods](https://openjdk.org/jeps/445).
+
+In the previous example, we were able to use pattern matching to switch over different record types. Now, let's set that aside for a second and talk about how we manage choices in Java.
 
 ## Choices, choices...
 
-Let's talk about enums now. Normal Java enums have a restricted set of static variants and cannot change the data they contain inside.
+What do you think of when you need a restricted set of alternatives to choose from? Java enums fit that bill; they are composed of a set of static variants and cannot change the data they contain inside.
 
 ```java
 public enum Color {
@@ -281,7 +325,7 @@ public enum Color {
 }
 ```
 
-Take the enum above: it defines three colours, red, green, and blue, with set values for the various fields, and it isn't possible to change the colour values within without messing up every single place where this enum is used (The values are final in the code above, but imagine if they weren't). 
+The enum above defines three colours, red, green, and blue, with set values for the various fields, and it isn't possible to change the colour values within without messing up every single place where this enum is used (The values are final in the code above, but imagine if they weren't). 
 
 Now, imagine a different problem. You want different colour representations such as RGB, HSL, and CMYK. Maybe just make an enum for it?
 
@@ -701,7 +745,7 @@ switch (color) {
 Java will still eagerly match whichever case evaluates to true first, so make sure to put more specific cases (guarded or not) first, followed by less specific ones.
 {{< /note-alert >}}
 
-### Ugh, exceptions (ft. an example from JEP 441)
+## Ugh, exceptions (ft. an example from JEP 441)
 
 We have a new class of exceptions to deal with now. Specifically, [`java.lang.MatchException`](https://download.java.net/java/early_access/jdk21/docs/api/java.base/java/lang/MatchException.html)[^matchexcept].
 
@@ -723,7 +767,7 @@ static void exampleAnR(R r) {
 }
 ```
 
-The switch block above will throw a `MatchException` because when `i''s getter is called, an `ArithmeticException` is thrown.  
+The switch block above will throw a `MatchException` because when i's getter is called, an `ArithmeticException` is thrown.  
 
 [JEP 441](https://openjdk.org/jeps/441) states:
 > (A record accessor method which always throws an exception is highly irregular, and an exhaustive pattern switch which throws a MatchException is highly unusual.)
