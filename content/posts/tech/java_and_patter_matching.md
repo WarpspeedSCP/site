@@ -1,5 +1,5 @@
 ---
-title: "Java 21 makes me actually like Java again"
+title: "Java 21's pattern matching could actually convince me to touch Java again"
 date: 2023-09-14T21:00:00+05:30
 categories:
 - JVM
@@ -73,15 +73,14 @@ No object can be cast to bottom since it is an empty set.
 
 An example of such a type is Kotlin's `Nothing`. It is considered an error for an instance of `Nothing` to exist. The way Kotlin prevents `Nothing` from being instantiated is [by setting its constructor to be private](https://github.com/JetBrains/kotlin/blob/7a7d392b3470b38d42f80c896b7270678d0f95c3/core/builtins/native/kotlin/Nothing.kt#L23).
 
-The Java version of this type is [`Void`](https://docs.oracle.com/javase/8/docs/api/java/lang/Void.html), the wrapper class for the `void` primitive type. It is, again, impossible to construct a `Void` instance because its constructor is private. You will never find a `Void` variable that holds a value other than `null`. 
+The Java version of this type is [`Void`](https://docs.oracle.com/javase/8/docs/api/java/lang/Void.html), the wrapper class for the `void` primitive type. It is, again, impossible to construct a `Void` instance because its constructor is private. However, `Void` cannot be considered a true bottom type because a `Void` variable can still hold `null`, which means it is technically a unit type[^thanks] (more on that below). In that sense, the primitive `void` does better. There's absolutely no way to use it as a variable type, so you can't even have an empty `void` variable.
 
-Now, you may feel that this fact disqualifies `Void` from being the bottom type; after all, any `Void` variable can still contain the value `null`, meaning `Void` *can* be represented.
-
-To solve this paradox, let's make it a rule for this discussion that `null` is not a valid value of *any* type in the JVM unless nullability is explicitly mentioned as a property of the type. We shall assume by default that `null` merely indicates the lack of a value.
-
+[^thanks]: Thanks to [`u/iconoklast`](https://old.reddit.com/r/programming/comments/16jkxfa/java_21_makes_me_actually_like_java_again/k0u8znc/) for pointing this out.
 ### The Top Type (`⊤`)
 
-This type represents every value of every type - the universal set of values, `U`. Java's top type is `java.lang.Object`. In Kotlin, this type is named `Any`. Meanwhile, `C` does as it do and overloads `void` by using `void *` to represent a pointer that can refer to a value of any type instead. How droll!
+This type represents every value of every type - the universal set of values, `U`. In Kotlin, this type is named `Any`. And it may be tempting to think `Object` (the Java equivalent of `Any`) is a top type, except for the fact that primitives exist. Primitives are wholly separate from Java's object model, and interact with objects in rather non-standard ways. Because of this, Java technically does not have a top type the way other languages do. 
+
+Meanwhile, `C` does as it do and overloads `void` by using `void *` to represent a pointer that can refer to a value of any type instead. How droll!
 
 Every object can be cast to top since `U` contains every value that exists.
 
@@ -156,7 +155,9 @@ str_2 = some_tuple[1] # (str, 1)
 In set theory, the word product usually refers to the *Cartesian* product of two sets. 
 
 {{< note-alert >}}
-The Cartesian product of two sets is a set of ordered pairs made from every possible combination of every element from both sets.
+The Cartesian product of two sets is a set of ordered pairs made from every possible combination of every element from both sets. 
+
+Thinking about it in simple math terms, the number of elements in the Cartesian product `C` of two sets `A` and `B` is the *product* of the number of elements in `A` and the number of elements in `B`.
 {{< /note-alert >}}
 
 You can use set theory notation to express the product of two types `A` and `B` as `C = A × B`. This product operation is not commutative; `A × B` is *not* the same as `B × A`. If you think about it for a bit, you'll see why: you'd be switching around the order of the declared components! The example I just talked about only uses two component types: `A` and `B`. How would we represent `some_type`, for example? The answer is to chain multiple product operations together, like so:
@@ -351,9 +352,6 @@ class Color {
 
 Obviously, this is NOT how anybody who knows Java would design the `Color` class. A much better way of implementing multiple colour representations without sacrificing readability is to use polymorphism! 
 
-{{< collapsible-item id="colour-abstract-class" title="Listing:&nbsp`Color`&nbspimplemented with an abstract class" size="math" >}}
-
-
 ```java
 public abstract class Color {}
 
@@ -428,8 +426,6 @@ public class HSL extends Color {
 }
 ```
 
-{{< /collapsible-item >}}
-
 Now, given a `Color` instance, you'd just need to check if it is an `instanceof` your desired colour representation, and you'd be able to access data from that representation. But this implementation has a flaw. How do we restrict what a colour is in our class hierarchy? Any user of your library could create a new `RYB` class that inherits from `Color`, or from `RGB`, for example. This becomes a problem when your library does not expect any new variants of `Color` to exist or if it does not expect specific `Color` variants to change their behaviour. Unless the API is designed to be extensible, creating new representations could cause crashes in the best case (So you have a chance of knowing what went wrong) or in the worst case, subtle bugs that affect code far away from the problem's source.
 
 To fix this, we could do a few things:
@@ -485,9 +481,6 @@ Note that the value of the union is overwritten in the second assignment of `dou
 This exposes the most significant flaw `C` unions have; there's no built-in way to know which variant is contained within a union value without external information. Thus, we need an external *discriminant* to determine what's inside. Java's polymorphism can do that for us with `instanceof`. But Java's class hierarchy is too open; there's no way to restrict the number of variants of a Java "union".
 
 What we need are *tagged unions*, which is exactly what sealed types allow us to represent. The `sealed` modifier exists to make it clear that you can't extend a sealed class beyond the classes allowed to inherit from it. This allows the developer to control how users interact with their library's API.
-
-
-{{< collapsible-item id="colour-sealed-class" title="Listing:&nbsp`Color`&nbspimplemented with a sealed class" size="math" >}}
 
 ```java
 public sealed class Color permits RGB, CMYK, YUV, HSL {
@@ -552,8 +545,6 @@ final class HSL extends Color {
     // Additional methods or properties specific to HSL
 }
 ```
-
-{{< /collapsible-item >}}
 
 Note the syntax of the sealed class `Color`. There is a `sealed` modifier and a `permits` clause with the names of all the subclasses of `Color`. `permits` is used to specify which classes get to inherit from a particular class and is used to prevent any unwanted inheritance. Note also that each implementation of `Color` is marked as `final`, so you only get the four colour representations you see here; you can't make your own.
 
@@ -747,9 +738,7 @@ Java will still eagerly match whichever case evaluates to true first, so make su
 
 ## Ugh, exceptions (ft. an example from JEP 441)
 
-We have a new class of exceptions to deal with now. Specifically, [`java.lang.MatchException`](https://download.java.net/java/early_access/jdk21/docs/api/java.base/java/lang/MatchException.html)[^matchexcept].
-
-[^matchexcept]: I'll change this link once Java 21 is released.
+We have a new class of exceptions to deal with now. Specifically, [`java.lang.MatchException`](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/MatchException.html)
 
 What happens when a pattern match goes wrong? Consider the case of a bad record getter implementation:
 
