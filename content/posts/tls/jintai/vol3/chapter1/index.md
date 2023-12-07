@@ -1,7 +1,6 @@
 ---
 title: "Humanity has Declined: Volume 3, Part 1"
 date: 2023-11-07T21:53:52+05:30
-draft: true
 categories:
 - jintai
 - translation
@@ -139,7 +138,7 @@ The book on Grandfather's desk suddenly pops open. This one, who'd been serving 
 The fairy adorning the milk pot jumps up and down.
 
 
-"I've been waiting!" "FOOOOOOODDDD!" "FEEEEEEVEEEEEERRRRRRR!"
+"I've been waiting!" "Merci!" "FEEEEEEVEEEEEERRRRRRR!"
 
 
 The fairies pinned to corkboards, the tube-holding fairies hard at work as pen-holders, the pairs of fairies standing in for book stands, and last but not the least, the fairy who's been playing the angel of the table bell, all gather on the table.
