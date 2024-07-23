@@ -1,0 +1,2 @@
+{"rule":"ORDER_OF_WORDS_WITH_NOT","sentence":"^\\QA fairy could sit on a mushroom, couldn't it.\\E$"}
+{"rule":"MORFOLOGIK_RULE_EN_US","sentence":"^\\Q陽光の下から離れることに抵抗はありますが、わたしたちは廊下の奥へと進むことにしました。地上がすぐ上にあると思えば、いくぶんは気も楽なものです。幾度か角を曲がり、階段をのぼり、階段をおり、やがてはじめて現れたＴ字路に歩みを止められました。\\E$"}
