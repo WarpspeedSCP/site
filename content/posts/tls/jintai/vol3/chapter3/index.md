@@ -16,7 +16,6 @@ disqus_identifier: "jintaiv3c1p3"
 disqus_title: "Jinrui wa Suitai Shimashita Volume 3 Part 3"
 ---
 
-
 A large group of cars is driving down a rough road, filled to bursting with equipment and personnel.
 
 
@@ -79,6 +78,7 @@ I present my complaints to the scenery.
 
 He's saying it's taking awfully long.
 
+<hr/>
 
 "We're here..."
 
@@ -1001,7 +1001,7 @@ When I wake up, my sleep-addled brain can't yet make sense of why I'm sprawled u
 "... What a dull morning."
 
 
-Even this light, that I had been so grateful for last night, now only serves to emphasize the feeling of claustrophobia within me.
+Even this light, which I'd been so grateful for last night, now only serves to emphasize the feeling of claustrophobia within me.
 
 
 The Assistant, who is beside me in his own sleeping bag, also begins to stir.
@@ -1500,5 +1500,3 @@ An electronic beep sounds.
 
 
 The call ends.
-
-
