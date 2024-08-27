@@ -26,7 +26,13 @@ slug: java-pattern-matching
 Whatever notation is used in this article does not represent how the math is usually presented. If you study this further or have already studied this subject, there may be mistakes, or terms I've used incorrectly. Please point out such mistakes in the comments, and I will update the article ASAP. Also, note that I'm borrowing the type theory notation from Wikipedia.
 {{< /note-alert >}}
 
-Java 21 will be released on September 19, 2023, supporting record patterns in switch blocks and expressions. Such syntax is monumental (At least, in Java land). It marks the point where Java could be considered to properly support functional programming patterns in ways similar to Kotlin, Rust, or C#. And it marks the first point where I can say, as a Kotlin developer, that I feel jealous.
+<div style="margin-top:8px">
+{{< note-alert >}}
+Some of the info here is now outdated, so I've given this post a revisit. You can check out the old version of this post on the site's [github](), or on the wayback machine if you wish to.
+{{< /note-alert >}}
+<div>
+
+Java 21 was released on September 19, 2023, and brought support for record patterns in switch blocks and expressions. Such syntax is monumental (At least, in Java land). It marks the point where Java could be considered to properly support functional programming patterns in ways similar to Kotlin, Rust, or C#. And it marks the first point where I can say, as a Kotlin developer, that I feel jealous.
 
 ## A brief history of recent Java versions.
 
@@ -55,7 +61,7 @@ Java 14 stabilised switch expressions, 16 records and `instanceof` pattern match
 
 This set of changes allows Java to express one of the foundations of functional programming that the language never could before - Algebraic data types, along with idiomatic ways of using them. 
 
-Algebraic data types are a concept born from *Type theory*, which is a branch of Set theory that focuses specifically on questions like "Is an *Apple* a *Fruit*?" and other such whimsical conundrums math teachers like to pose to hapless students the world over.
+Algebraic data types are a concept born from *Type theory*, which is a branch of Set theory that focuses specifically on questions like "Is an *Apple* a *Fruit*?" and other such whimsical conundrums theoretical math teachers like to pose to hapless students the world over.
 
 ## A *very* minimal introduction to some terms from type theory
 
@@ -65,7 +71,7 @@ So, instead of explaining type theory, I will talk about a few specific kinds of
 
 ### The Bottom, or Empty Type (`⊥`)
 
-This type describes the set of all values which *can't be computed*[^turing]. This set is usually empty for any normal programming language (Ø).
+This type describes the set of all values which *can't be computed*[^turing]. This set is usually empty for any normal programming language (`Ø`).
 
 [^turing]: When I say can't be computed, I mean it in the [Turing-complete](https://en.wikipedia.org/wiki/Turing_completeness) sense.
 
@@ -160,7 +166,9 @@ The Cartesian product of two sets is a set of ordered pairs made from every poss
 Thinking about it in simple math terms, the number of elements in the Cartesian product `C` of two sets `A` and `B` is the *product* of the number of elements in `A` and the number of elements in `B`.
 {{< /note-alert >}}
 
-You can use set theory notation to express the product of two types `A` and `B` as `C = A × B`. This product operation is not commutative; `A × B` is *not* the same as `B × A`. If you think about it for a bit, you'll see why: you'd be switching around the order of the declared components! The example I just talked about only uses two component types: `A` and `B`. How would we represent `some_type`, for example? The answer is to chain multiple product operations together, like so:
+You can use set theory notation to express the product of two types `A` and `B` as `C = A × B`. This product operation is not commutative; `A × B` is *not* the same as `B × A`. If you think about it for a bit, you'll see why: you'd be switching around the order of the declared components! 
+
+Now, the example I just talked about only uses two component types: `A` and `B`. How would we represent `some_type`, for example? The answer is to chain multiple product operations together, like so:
 
 ```
 some_type = int × char* × double × int

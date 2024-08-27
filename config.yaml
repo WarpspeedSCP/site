@@ -1,11 +1,15 @@
 languageCode: "en-us"
-baseUrl: "https://wscp.dev"
+baseUrl: ""
 title: "WSCP's blog"
 theme: "anubis"
 paginate: 10
-disqusShortname: "wscp-dev"
 # googleAnalytics: "G-12345"
-# enableRobotsTXT: true
+enableRobotsTXT: true
+
+config:
+  services:
+    disqus:
+      shortName: "wscp-dev"
 
 menu:
   main:
@@ -19,10 +23,6 @@ menu:
     title: About
     url: /about
     weight: 2
-  - identifier: donate
-    name: Donate
-    url: https://ko-fi.com/wscptl
-    weight: 3
 
 params:
   author: "wscp"
@@ -71,9 +71,9 @@ params:
   social:
   - id: github
     name: WarpspeedSCP
-#  - id: hugo
-#    url: "https://gohugo.io/"
-#    icon: "hugo"
+  - id: twitter
+    url: "https://x.com/wscp13"
+    icon: "twitter"
 
 markup:
   goldmark:
